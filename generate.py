@@ -129,6 +129,7 @@ def main(args):
                 if not args.quiet:
                     if src_dict is not None:
                         print('S-{}\t{}'.format(sample_id, src_str))
+                        print('S-{}\t{}'.format(sample_id, len(src_str.split())))
                     if has_target:
                         print('T-{}\t{}'.format(sample_id, target_str))
 
@@ -142,9 +143,11 @@ def main(args):
                         tgt_dict=tgt_dict,
                         remove_bpe=args.remove_bpe,
                     )
+                    attention_matrix = hypo['attention']
 
                     if not args.quiet:
                         print('H-{}\t{}\t{}'.format(sample_id, hypo['score'], hypo_str))
+                        print('H-{}\t{}\t{}'.format(sample_id, hypo['score'], len(hypo_str.split())))
                         print('P-{}\t{}'.format(
                             sample_id,
                             ' '.join(map(
@@ -158,6 +161,17 @@ def main(args):
                                 sample_id,
                                 ' '.join(map(lambda x: str(utils.item(x)), alignment))
                             ))
+
+                            print('A-{}\t{}'.format(
+                                sample_id,
+                                len(' '.join(map(lambda x: str(utils.item(x)), alignment)).split())
+                            ))
+                            print('AM-{}\t{}'.format(
+                                sample_id,
+                                attention_matrix.shape
+                            ))
+                            file_to_write = 'am_eten/am_test-{}.pt'.format(sample_id)
+                            torch.save(attention_matrix, file_to_write)
 
                     # Score only the top hypothesis
                     if has_target and j == 0:
